@@ -1,0 +1,53 @@
+[MorphologyFileInformation]
+   FileCreatedBy    = Delft3D FLOW-GUI, Version: 3.56.29165         
+   FileCreationDate = Mon Oct 21 2019, 15:05:27         
+   FileVersion      = 02.00                        
+[Morphology]
+   EpsPar           = false                         Vertical mixing distribution according to van Rijn (overrules k-epsilon model)         
+   IopKCW           = 1                             1 : RC determine roughness from current         
+   RDC              = 0.01                 [m]      Current related roughness height (only used if IopKCW <> 1)
+   RDW              = 0.02                 [m]      Wave related roughness height (only used if IopKCW <> 1)
+   MorFac           =  1.0000000e+000      [-]      Morphological scale factor
+   MorStt           =  1.4400000e+003      [min]    Spin-up interval from TStart till start of morphological changes
+   Thresh           =  5.0000001e-002      [m]      Threshold sediment thickness for transport and erosion reduction
+   MorUpd           = true                          Update bathymetry during FLOW simulation
+   CmpUpd           = true                          Update gsd during FLOW simulation
+   EqmBc            = true                          Equilibrium sand concentration profile at inflow boundaries
+   DensIn           = false                         Include effect of sediment concentration on fluid density
+   AksFac           =  1.0000000e+000      [-]      van Rijn's reference height = AKSFAC * KS
+   RWave            =  2.0000000e+000      [-]      Wave related roughness = RWAVE * estimated ripple height. Van Rijn Recommends range 1-3
+   AlfaBs           =  1.0000000e+000      [-]      Streamwise bed gradient factor for bed load transport
+   AlfaBn           =  1.5000000e+000      [-]      Transverse bed gradient factor for bed load transport
+   Sus              =  1.0000000e+000      [-]      Multiplication factor for suspended sediment reference concentration
+   Bed              =  1.0000000e+000      [-]      Multiplication factor for bed-load transport vector magnitude
+   SusW             =  1.0000000e+000      [-]      Wave-related suspended sed. transport factor
+   BedW             =  1.0000000e+000      [-]      Wave-related bed-load sed. transport factor
+   SedThr           =  1.0000000e-001      [m]      Minimum water depth for sediment computations
+   ThetSD           =  0.0000000e+000      [-]      Factor for erosion of adjacent dry cells
+   HMaxTH           =  1.5000000e+000      [m]      Max depth for variable THETSD. Set < SEDTHR to use global value only
+   FWFac            =  1.0000000e+000      [-]      Vertical mixing distribution according to van Rijn (overrules k-epsilon model)
+   Espir            = 1.0                  [-]      Calibration factor spiral flow
+   ISlope           = 3                    [-]      Flag for bed slope effect
+   AShld            = 0.55                 [-]      Bed slope parameter Koch & Flokstra A ~ 9 (D50/h)^0.3 ~ 0.31, talmon 1995
+   BShld            = 0.5                  [-]      Bed slope parameter Koch & Flokstra f = A theta^B
+   UpdInf           = false                [1]      Update bed level at inflow boundaries
+   IHidExp          = 1                    [1]      1 : no hiding or exposure
+[Underlayer]
+   IUnderLyr        = 2                    [-]      Stratigraphy model : 1 : one layer, 2 : multiple layers
+   ExchLyr          = false                [-]     
+   TTLForm          = 1                    [-]      Transport layer thickness mode : 1 = constant
+   ThTrLyr          = 1.0                  [m]      Thickness of the transport layer
+   MxNULyr          = 10                   [-]      Underlayers (excl transp & base lyrs)
+   ThUnLyr          = 1.0                  [m]      Thickness of each underlayer
+   UpdBaseLyr       = 1                    [-]      update thickness and composition of base layer
+   IPorosity        = 0                    [-]      dynamically calculate porosity
+   IDiffusion       = 0                            
+   Flufflyr         = 0                            
+[Output]
+   Frac             = true                         
+   Dm               = true                 [-]      Output arithmetic mean sediment diameter
+   Dg               = true                 [-]     
+   Percentiles      = true                         
+   ShearVeloc       = true
+   Bedforms         = true
+   TranspType       = 2

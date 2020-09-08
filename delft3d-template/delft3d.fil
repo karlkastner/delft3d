@@ -1,0 +1,48 @@
+Domain, Checked : No        
+     Grid                  : Z:\home\pia\phd\src\lib\interface\delft3d\d3d-template\template.grd
+     Grid enclosure        : Z:\home\pia\phd\src\lib\interface\delft3d\d3d-template\template.grd
+     Bathymetry            : Z:\home\pia\phd\src\lib\interface\delft3d\d3d-template\template.dep
+     Dry points            : none
+     Thin dams             : none
+
+Time frame, Checked : No        
+
+Processes, Checked : No        
+
+Initial conditions, Checked : No        
+     Initial conditions    : Z:\home\pia\phd\src\lib\interface\delft3d\d3d-template\template.ini
+
+Boundaries, Checked : No        
+     Boundary definitions  : none
+     Astronomical flow conditions : none
+     Astronomical corrections : none
+     Harmonic flow conditions : none
+     QH-relation flow conditions : none
+     Time series flow conditions : none
+     Transport conditions  : none
+
+Physical parameters, Checked : No        
+     Roughness coefficients : none
+     Hor. viscosity/diffusivity : none
+     Heat flux model data  : none
+     Sediment data         : Z:\home\pia\phd\src\lib\interface\delft3d\d3d-template\delft3d.sed
+     Morphology data       : Z:\home\pia\phd\src\lib\interface\delft3d\d3d-template\delft3d.mor
+     Uniform wind data     : none
+     Space varying wind data : none
+
+Numerical parameters, Checked : No        
+
+Operations, Checked : No        
+     Discharge definitions : none
+     Discharge data        : none
+     Dredging and dumping data : none
+
+Monitoring, Checked : No        
+     Observation points    : none
+     Drogues               : none
+     Cross-sections        : none
+
+Additional parameters, Checked : No        
+
+Output, Checked : No        
+     Fourier analysis data : none

@@ -1,0 +1,104 @@
+table-name           'Boundary Section : 1'
+contents             'Uniform   '
+location             'Outflow             '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Sand  110um end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Sand  110um end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000
+table-name           'Boundary Section : 1'
+contents             'Uniform   '
+location             'Outflow             '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Sand  350um end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Sand  350um end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000
+table-name           'Boundary Section : 1'
+contents             'Uniform   '
+location             'Outflow             '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Sand 1100um end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Sand 1100um end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000
+table-name           'Boundary Section : 1'
+contents             'Uniform   '
+location             'Outflow             '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Gravel 11mm end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Gravel 11mm end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000
+table-name           'Boundary Section : 2'
+contents             'Uniform   '
+location             'Inflow              '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Sand  110um end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Sand  110um end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000
+table-name           'Boundary Section : 2'
+contents             'Uniform   '
+location             'Inflow              '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Sand  350um end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Sand  350um end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000
+table-name           'Boundary Section : 2'
+contents             'Uniform   '
+location             'Inflow              '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Sand 1100um end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Sand 1100um end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000
+table-name           'Boundary Section : 2'
+contents             'Uniform   '
+location             'Inflow              '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '  unit '[min]'
+parameter            'Sediment Gravel 11mm end A uniform'       unit '[kg/m3]'
+parameter            'Sediment Gravel 11mm end B uniform'       unit '[kg/m3]'
+records-in-table     2
+ 0.0000000e+000  0.0000000e+000  1.0000000e+000
+ 6.0000000e+008  0.0000000e+000  1.0000000e+000

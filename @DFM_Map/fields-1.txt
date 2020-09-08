@@ -1,0 +1,50 @@
+                       Mesh2D: -2147483647
+                      NetNode_x: [202x1 double]
+                      NetNode_y: [202x1 double]
+    projected_coordinate_system: -2147483647
+                      NetNode_z: [202x1 double]
+                        NetLink: [2x301 int32]
+                    NetLinkType: [301x1 int32]
+                    NetElemNode: [4x100 double]
+                    NetElemLink: [4x100 int32]
+               NetLinkContour_x: [4x301 double]
+               NetLinkContour_y: [4x301 double]
+                     NetLink_xu: [301x1 double]
+                     NetLink_yu: [301x1 double]
+                        BndLink: [202x1 int32]
+                   FlowElem_xcc: [100x1 double]
+                   FlowElem_ycc: [100x1 double]
+                   FlowElem_zcc: [100x1 double]
+                   FlowElem_bac: [100x1 double]
+                   FlowElem_xzw: [100x1 double]
+                   FlowElem_yzw: [100x1 double]
+              FlowElemContour_x: [4x100 double]
+              FlowElemContour_y: [4x100 double]
+                    FlowElem_bl: [100x1 double]
+                       FlowLink: [2x101 int32]
+                   FlowLinkType: [101x1 int32]
+                    FlowLink_xu: [101x1 double]
+                    FlowLink_yu: [101x1 double]
+                  FlowLink_lonu: [101x1 double]
+                  FlowLink_latu: [101x1 double]
+                           time: [6x1 double]
+                       timestep: [6x1 double]
+                             s1: [100x6 double]
+                             s0: [100x6 double]
+                     waterdepth: [100x6 double]
+                       numlimdt: [100x6 double]
+                           taus: [100x6 double]
+                          unorm: [101x6 double]
+                             u0: [101x6 double]
+                             q1: [101x6 double]
+                            ucx: [100x6 double]
+                            ucy: [100x6 double]
+                            czs: [100x6 double]
+                    institution: 'Deltares'
+                     references: 'http://www.deltares.nl'
+                         source: 'Deltares, D-Flow FM Version 1.1.191.47689, Nov  7 2016, 10:36:07, model'
+                        history: 'Created on 2016-11-28T14:21:19+0100, D-Flow FM'
+                   date_created: '2016-11-28T14:21:19+0100'
+                  date_modified: '2016-11-28T14:21:19+0100'
+                    Conventions: 'UGRID-0.9'
+

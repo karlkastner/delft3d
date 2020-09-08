@@ -1,0 +1,35 @@
+[MorphologyFileInformation]
+    FileCreatedBy         = Deltares, FM-Suite DFlowFM Model Version 1.3.2.37884, DFlow FM Version 1.1.192.51419 
+    FileCreationDate      = Thu Feb 08 2018, 20:40:49 
+    FileVersion           = 02.00                  
+[Morphology]
+    MorFac                = 1                      # 17.180 time scale of morphological changes
+    MorStt                = 720                    # startup time
+    Thresh                = 0.05                   
+    BedUpd                = 1                      # update bed elevation (morph on)
+    CmpUpd                = 0                      # update bed decomposition
+    NeuBcMud              = 1                      #
+    NeuBcSand             = 1                      # equilibrium sand inflow
+    DensIn                = 0                      # effect of sediment on density
+    ISlope                = 3                      # 3 : Koch flockstra
+    AlfaBs                = 1                      # 17.54 bed slope effect scale
+    AlfaBn                = 1.5                    # 17.49 (for bagnold only)
+    Ashld                 = 0.85                   # 17.56 scale for shields stress
+    Bslhd                 = 0.5                    # 17.56 power for shields stress
+    Cshld                 = 0                      # 17.56 D/H exponent
+    Dshld                 = 0                      # 17.56 Di/Dm exponent
+    CoulFri               = 0                      # (not used for KF)
+    FlFdRat               = 0                      # (not used)
+    ThetaCr               = 0                      # (not used)
+    IHidExp               = 1                      # 1 : no hiding and exposure mode
+    ASKLHE                = 1                      # 17.41 hiding exposure (parker only)
+    MWWJHE                = 1                      # 17.43 hiding exposure (wu only)
+    Espir                 = 1                      # scale effect of spiral flow (17.38)
+    Sus                   = 1                      
+    Bed                   = 1                      
+    SusW                  = 1                      # 17.82 suspension due to waves
+    BedW                  = 1                      # bed load due to waves
+    SedThr                = 0.1                    # 17.181 dry cell depth, minimum depth to compude sediment tranport
+    ThetSD                = 1                      # 17.181 erode neighbouring dry cells
+    HMaxTH                = 1.5                    # 17.181 modification parameter for dry cell erosion
+    BcFil                 =                        # ?

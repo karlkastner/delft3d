@@ -1,0 +1,21 @@
+Commnt = Trtrou : Trachotype roughnes
+Trtrou = #Y#
+Commnt = Definition file trachytopes 
+Trtdef = #trachytope.def#
+Commnt = Area file trachytopes u -direction
+Commnt = Trtu = #name#
+Commnt = Area file trachytopes v -direction
+Commnt = Trtv = #name#
+Commnt = Time step in minutes for updating roughness and resistance coefficients based on trachytopes, Must be a multiple of Dt
+TrtDt  = 10
+Commnt = Spatial calibration factor for trachytopes u -direction uniform 1
+Commnt = TrtClu #name#
+Commnt = Spatial calibration factor for trachytopes v -direction uniform 1
+Commnt = TrtClv #name#
+Commnt = Minimum water depth in roughness computation
+Commnt = TrtMnH =  Dryflc
+Commnt = Area averaging method
+Commnt = TrtMth = 1
+Commnt = Serial factor in averaging of area roughnesses
+Commnt = TrtAsr = 0.6
+

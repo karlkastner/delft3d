@@ -1,0 +1,10 @@
+table-name           'Boundary Section : 2'
+contents             'Uniform             '
+location             'Outlow              '
+xy-function          'equidistant'
+interpolation        'linear'
+parameter            'total discharge (t)  end A'               unit '[m3/s]'
+parameter            'water elevation (z)  end B'               unit '[m]'
+records-in-table     2
+    0.0000000e+00    0.0000000e+00
+    5.0000000e+04    1.5552594e+01

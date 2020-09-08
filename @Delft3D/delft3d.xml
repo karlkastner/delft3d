@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<deltaresHydro xmlns="http://schemas.deltares.nl/deltaresHydro"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://schemas.deltares.nl/deltaresHydro http://content.oss.deltares.nl/schemas/d_hydro-1.00.xsd">
+    <documentation>
+    </documentation>
+    <control>
+        <sequence>
+            <start>myNameFlow</start>
+        </sequence>
+    </control>
+    <flow2D3D name="myNameFlow">
+        <library>flow2d3d</library>
+        <mdfFile>delft3d.mdf</mdfFile>
+    </flow2D3D>
+    <delftOnline>
+        <enabled>false</enabled>
+        <urlFile>delft3d.url</urlFile>
+        <waitOnStart>false</waitOnStart>
+        <clientControl>true</clientControl>
+        <clientWrite>false</clientWrite> 
+    </delftOnline>
+</deltaresHydro>

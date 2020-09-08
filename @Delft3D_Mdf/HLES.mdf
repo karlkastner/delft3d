@@ -1,0 +1,17 @@
+Commnt  = Htur2d Enable the use of HLES                                         
+Htur2d = #YES#
+Commnt = Htural : Slope in log-log spectrum
+Htural = 1.666666
+Commnt = Hturnd : Number of Dimensions
+Hturnd = 2
+Commnt = Hturst : Prandtl-Schmidt number
+Hturst = 0.7
+Commnt = Hturlp : Spatial low-pass filter coefficient
+Hturlp = 0.3333333
+Commnt = Hturrt : Relaxation time
+Hturrt = 1.0
+Commnt = Hturdm : Molecular diffusivity
+Hturdm = 0.0
+Commnt = Hturel : Elder’s term switch
+Hturel = #YES#
+

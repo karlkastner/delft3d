@@ -1,0 +1,11 @@
+Zmodel=#Y#
+Ztop=1.0
+Zbot=-49
+L2norm=#Y#
+Epsnh=1e-3
+Commnt= Non-Hydrostatic Flow
+Nonhyd=#YES#
+Commnt=Nharea:
+Commnt=Nhiter:
+Ztbml=#Y#
+

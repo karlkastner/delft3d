@@ -1,0 +1,28 @@
+table-name           'Boundary Section : 1'
+contents             'Uniform             '
+location             'Outflow             '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '                     unit '[min]'
+parameter            'water elevation (z)  end A'               unit '[m]'
+parameter            'water elevation (z)  end B'               unit '[m]'
+records-in-table     2
+0.000000e+00 3.692549e+00 3.692549e+00
+8.411040e+06 3.711927e+00 3.711927e+00
+table-name           'Boundary Section : 2'
+contents             'Uniform             '
+location             'Inflow              '
+time-function        'non-equidistant'
+reference-time       20200101
+time-unit            'minutes'
+interpolation        'linear'
+parameter            'time                '                     unit '[min]'
+parameter            'total discharge (t)  end A'               unit '[m3/s]'
+parameter            'total discharge (t)  end B'               unit '[m3/s]'
+records-in-table     2
+0.000000e+00             0             0
+1.440000e+03 -4.551721e+03 -4.551721e+03
+8.411040e+06 -4.591602e+03 -4.591602e+03
+

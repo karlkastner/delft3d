@@ -1,0 +1,57 @@
+                        mesh2d: -2147483647
+    projected_coordinate_system: -2147483647
+                  mesh2d_node_x: [1907x1 double]
+                  mesh2d_node_y: [1907x1 double]
+                  mesh2d_node_z: [1907x1 double]
+              mesh2d_edge_nodes: [2x5332 double]
+                  mesh2d_edge_x: [5332x1 double]
+                  mesh2d_edge_y: [5332x1 double]
+              mesh2d_edge_x_bnd: [2x5332 double]
+              mesh2d_edge_y_bnd: [2x5332 double]
+              mesh2d_face_nodes: [3x3426 double]
+                  mesh2d_face_x: [3426x1 double]
+                  mesh2d_face_y: [3426x1 double]
+              mesh2d_face_x_bnd: [3x3426 double]
+              mesh2d_face_y_bnd: [3x3426 double]
+               mesh2d_edge_type: [5332x1 double]
+             mesh2d_flowelem_ba: [3426x1 double]
+             mesh2d_flowelem_bl: [3426x1 double]
+                           time: [49x1 double]
+                       timestep: [49x1 double]
+                mesh2d_Numlimdt: [3426x49 double]
+                      mesh2d_s1: [3426x49 double]
+              mesh2d_waterdepth: [3426x49 double]
+                      mesh2d_u1: [5332x49 double]
+                     mesh2d_ucx: [3426x49 double]
+                     mesh2d_ucy: [3426x49 double]
+                    mesh2d_ucxq: [3426x49 double]
+                    mesh2d_ucyq: [3426x49 double]
+                      mesh2d_q1: [5332x49 double]
+                    mesh2d_taus: [3426x49 double]
+                     mesh2d_czs: [3426x49 double]
+                 mesh2d_spircrv: [3426x49 double]
+                 mesh2d_spirint: [3426x49 double]
+                         morfac: [49x1 double]
+                          morft: [49x1 double]
+                      mesh2d_ws: [3426x1x49 double]
+                  mesh2d_rsedeq: [3426x1x49 double]
+              mesh2d_myfraction: [3426x49 double]
+                  mesh2d_z0ucur: [5332x49 double]
+                  mesh2d_z0urou: [5332x49 double]
+                     mesh2d_ssn: [5332x1x49 double]
+                     mesh2d_sst: [5332x1x49 double]
+                     mesh2d_sbn: [5332x1x49 double]
+                     mesh2d_sbt: [5332x1x49 double]
+                   mesh2d_sxtot: [3426x1x49 double]
+                   mesh2d_sytot: [3426x1x49 double]
+                  mesh2d_mor_bl: [3426x49 double]
+                  mesh2d_bodsed: [1x3426x49 double]
+                   mesh2d_dpsed: [3426x49 double]
+                    institution: 'Deltares'
+                     references: 'http://www.deltares.nl'
+                         source: 'D-Flow FM 1.1.192.51419. Model:'
+                        history: 'Created on 2018-02-08T17:12:02+0100, D-Flow FM'
+                   date_created: '2018-02-08T17:12:02+0100'
+                  date_modified: '2018-02-08T17:12:02+0100'
+                    Conventions: 'CF-1.6 UGRID-1.0/Deltares-0.8'
+

@@ -1,0 +1,21 @@
+                    NetElemNode: [3x5627 double]
+                    NetElemLink: [3x5627 int32]
+                   FlowElem_xcc: [5627x1 double]
+                   FlowElem_ycc: [5627x1 double]
+
+                   FlowElem_zcc: [5627x1 double]
+                   FlowElem_bac: [5627x1 double]	?
+                   FlowElem_xzw: [5627x1 double]
+                   FlowElem_yzw: [5627x1 double]
+              FlowElemContour_x: [10x5627 double]
+              FlowElemContour_y: [10x5627 double]
+                    FlowElem_bl: [5627x1 double]	?
+
+                             s1: [5627x45 double]
+                     waterdepth: [5627x45 double]
+                       numlimdt: [5627x45 double]
+                           taus: [5627x45 double]
+                            ucx: [5627x45 double]
+                            ucy: [5627x45 double]
+                            czs: [5627x45 double]
+
