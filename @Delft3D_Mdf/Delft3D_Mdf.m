@@ -30,6 +30,13 @@ classdef Delft3D_Mdf < handle
 			obj.mdf.dat.(pname) = pval;
 			end
 		end
+		function val = get(obj,pname)
+			val = obj.mdf.dat.(pname);
+			num = str2num(val);
+			if (~isempty(num))
+				val = num;
+			end
+		end
 
 		function set_(obj,s)
 			f_C   = fieldnames(s);
@@ -86,8 +93,22 @@ classdef Delft3D_Mdf < handle
 			obj.mdf.dat.Filic   = ['#',base,'.ini#'];
 			% ?
 			obj.mdf.dat.Filtd   = ['#',base,'.thd#'];
-			% sediment definition
-			obj.mdf.dat.Filsed  = ['#',base,'.sed#'];
+			sub2 = strtrim(obj.mdf.dat.Sub2);
+			if (length(sub2)>0 && sub2(1) == '#')
+				sub2 = sub2(2:end);
+			end
+			if (length(sub2)<2 || (sub2(2) ~= 'C'))
+				obj.mdf.dat.FilbcC = '';
+				obj.mdf.dat.Filsed = '';
+				obj.mdf.dat.Filmor = '';
+			else
+				% sediment definition
+				obj.mdf.dat.Filsed  = ['#',base,'.sed#'];
+				% morphodynamics
+				obj.mdf.dat.Filmor = ['#',base,'.mor#'];
+				% transport conditions at boundaries
+				obj.mdf.dat.FilbcC = ['#',base,'.bcc#'];
+			end
 			% roughness model
 			obj.mdf.dat.Trtu    = ['#',base,'.trtu#'];
 			obj.mdf.dat.Trtv    = ['#',base,'.trtv#'];
@@ -101,8 +122,12 @@ classdef Delft3D_Mdf < handle
 			obj.mdf.dat.FilbcQ = ['#',base,'.bcq#'];
 			% boundaries as time series
 			obj.mdf.dat.FilbcT = ['#',base,'.bct#'];
-			% transport conditions at boundaries
-			obj.mdf.dat.FilbcC = ['#',base,'.bcc#'];
+			% 
+			obj.mdf.dat.Filsta = ['#',base,'.obs#'];
+			% 
+			obj.mdf.dat.Filcrs = ['#',base,'.crs#'];
+			%
+			obj.mdf.dat.Trtdef = ['#',base,'.tra#'];
 		end % set_filenames
 
 		function [obj2, obj] = copy(obj)
@@ -140,6 +165,21 @@ classdef Delft3D_Mdf < handle
 			if (nargin() < 3)
 				folder = '.';
 			end
+			% sanity checks
+			% TODO, only if field exists
+			Tlfsmo = str2num(obj.mdf.dat.Tlfsmo);
+			Tstop  = str2num(obj.mdf.dat.Tstop);
+			if (Tlfsmo > Tstop)
+				obj.mdf.dat.Tlfsmo = obj.mdf.dat.Tstop;
+			end
+			for f = {'Flmap','Flhis','Flpp'}
+			val = str2num(obj.mdf.dat.(f{1}));
+			if (val(3) > Tstop)
+				val(3) = Tstop;
+				obj.mdf.dat.(f{1}) = num2str(val);
+			end
+			end % for f
+
 			%obj.mdf.file_str = mdf_str;
 			fid = fopen([folder,filesep,mdf_str],'w');
 			%line = fgetl(fid);

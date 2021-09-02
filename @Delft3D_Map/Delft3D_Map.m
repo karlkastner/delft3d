@@ -18,6 +18,7 @@ classdef Delft3D_Map < handle
 	properties
 		% map file pointer
 		map
+		gsd
 		% reading options
 		vsopt = 'quiet';
 		% mesh
@@ -39,34 +40,51 @@ classdef Delft3D_Map < handle
 		u3_
 		v3_
 		w3_
-		c_
+		sediment_concentration_
+		salinity_concentration_
 		u2_
 		v2_
 		w2_
 		qv_
 		qu_
-		ssu2_;
-		ssv2_;
-		sbu3_;
-		sbv3_;
+		ssuk_;
+		ssvk_;
+		pssv_;
+		dssv_;
+		sbuk_;
+		sbvk_;
 		ssu_;
 		ssv_;
 		sbu_;
 		sbv_;
+		volume_;
+		ustar_;
 		dunelength_;
 		duneheight_;
 		viscosity_uv_;
 		Cu_;
 		nu_;
+		bs_;
+		bsout;
+		ibs_;
+		zs_;
+		zb_;
 		settling_velocity_;
 		reference_concentration_;
 		equilibrium_concentration_;
 		nanval = -999;
+		area_ = [];
+		bsparam;
+		cp;
+		morfac_;
 	end
 	methods
 	function obj = Delft3D_Map()
 	end
 	function init(obj,folder_)
+		% clear
+		% TODO, reset tmp vars
+		obj.map   = [];
 		if (strcmp(folder_(end-2:end),'dat'))
 			path = folder_;
 		else
@@ -87,6 +105,14 @@ classdef Delft3D_Map < handle
 		end
 		end
 		obj.map   = vs_use(path,obj.vsopt);
+		try
+			gsd = load([folder_,'/gsd.csv']);
+			obj.gsd.d = gsd(1,:);
+			obj.gsd.p = gsd(2,:); 
+		catch e
+			e
+		end
+
 		% init mesh
 		obj.X();
 	end
@@ -107,11 +133,11 @@ classdef Delft3D_Map < handle
 		end
 	end
 
-	function nul = nul(obj)
+	function nul = nul(obj,varargin)
 		if (~isempty(obj.nul_))
 			nul = obj.nul_;
 		else
-			s   = vs_disp(obj.map,'map-sed-series','MSED',obj.vsopt);
+			s   = vs_disp(obj.map,'map-sed-series',varargin,'MSED',obj.vsopt);
 			siz = s.SizeDim;
 			nul = siz(3);
 			%nul = vs_get(obj.map,'map-const','LSED',obj.vsopt);
@@ -119,11 +145,21 @@ classdef Delft3D_Map < handle
 		end
 	end
 
+	% time step in days (matlab default unit of time)
+	function dt = dt(obj)
+		dt = vs_let(obj.map,'map-const','DT',obj.vsopt)/1440;
+	end
+
+	function nt = nt(obj)
+		nt = length(obj.time);
+	end
+
 	function time = time(obj)
 		if (isempty(obj.time_))
-			dt = vs_let(obj.map,'map-const','DT',obj.vsopt);
-			t  = vs_let(obj.map,'map-infsed-serie','ITMAPS',obj.vsopt);
-			time_d = dt*t/1440;
+			% nt  = vs_let(obj.map,'map-infsed-serie','ITMAPS',obj.vsopt);
+			% number of time steps
+			nt  = vs_let(obj.map,'map-info-series','ITMAPC',obj.vsopt);
+			time_d = obj.dt*nt;
 			%time_s = vs_let(obj.map,'map-infavg-serie','ITAVGS',obj.vsopt)
 			%time_d = time_s/86400;
 			obj.time_      =  time_d;
@@ -133,6 +169,7 @@ classdef Delft3D_Map < handle
 
 	function tmor = tmor(obj)
 		if (isempty(obj.tmor_))
+			% t  = vs_let(obj.map,'map-infsed-serie','ITMAPS',obj.vsopt);
 			obj.tmor_ = vs_let(obj.map, 'map-infsed-serie', ...
 					            'MORFT', obj.vsopt);
 		end
@@ -248,42 +285,75 @@ classdef Delft3D_Map < handle
 	function [N,S] = N(obj)
 		[S,N] = obj.S;
 	end
-	function depth = depth(obj)
-		depth = obj.zs - obj.zb;
+	function depth = depth(obj,varargin)
+		depth = obj.zs(varargin{:}) - obj.zb(varargin{:});
+	end
+	function ds = dsigma(obj)
+		ds = vs_let(obj.map,'map-const','THICK',obj.vsopt);
+	end
+	function dz   = dz(obj,varargin)
+		depth = max(0,obj.depth(varargin{:}));
+		ds    = obj.dsigma;
+		dz    = depth.*shiftdim(ds,-2);
 	end
 	function sigma = sigma(obj)
-		sigma = cumsum(mid([0,vs_let(obj.map,'map-const','THICK',obj.vsopt)]));
+		sigma = 1-cumsum(mid([0,obj.dsigma]));
 	end
-	function Z = Z(obj)
+
+	% distance from surface
+	function range = range(obj,varargin)
+		Z     = obj.Z(varargin{:});
+		range = obj.zs(varargin{:}) - Z;
+	end
+
+
+%	function sigma = sigma_(obj)
+%		sigma = 1-cumsum(([0,obj.dsigma]));
+%	endi
+	function Z = Z(obj,varargin)
 		if (~isempty(vs_find(obj.map,'LAYER_INTERFACE')))
-			Z = vs_let(obj.map,'map-series','LAYER_INTERFACE');
+			Z = vs_let(obj.map,'map-series',varargin,'LAYER_INTERFACE');
 			Z = 0.5*(Z(:,:,:,1:end-1)+Z(:,:,:,2:end));
 		else
-			disp('computing Z');
-			depth = obj.depth;
-			zb = obj.zb;
-			depth = depth(:,:,1:end-1);
-			zb = zb(:,:,1:end-1);
+			depth = obj.depth(varargin);
+			zb    = obj.zb(varargin);
+			%depth = depth(:,:,1:end-1);
+			%zb    = zb(:,:,1:end-1);
 			sigma = obj.sigma;
 			sigma = shiftdim(rvec(sigma),-2);
-			Z = bsxfun(@times,depth,1-sigma);
-			Z = bsxfun(@plus,zb,Z);
+			%Z     = bsxfun(@times,depth,1-sigma);
+			Z     = bsxfun(@times,depth,sigma);
+			Z     = bsxfun(@plus,zb,Z);
 		end
 	end
 
-	function zb = zb(obj)
+	function zb = zb(obj,varargin)
 		% DPS is documented as "bottom depth", but it is actually the
 		% bed level
-		zb     = -vs_let(obj.map,'map-sed-series','DPS',obj.vsopt);
+		if (isempty(obj.zb_))
+		if (~isempty(vs_find(obj.map,'DPS')))
+			zb     = -vs_let(obj.map,'map-sed-series',varargin,'DPS',obj.vsopt);
+		else
+			zb     = -vs_let(obj.map,'map-const','DPS0',obj.vsopt);
+		end
+			obj.zb_ = zb;
+		else
+			zb = obj.zb_;
+		end
 	end
-	function zs = zs(obj)
-		zs     =  vs_let(obj.map,'map-series','S1',obj.vsopt);
+	function zs = zs(obj,varargin)
+		if (isempty(obj.zs_))
+			zs     =  vs_let(obj.map,'map-series',varargin,'S1',obj.vsopt);
+			obj.zs_ = zs;
+		else
+			zs = obj.zs_;
+		end
 	end
-	function u3 = u3(obj)
+	function u3 = u3(obj,varargin)
 		if (~isempty(obj.u3_))
 			u3  = obj.u3_;
 		else
-			u3      =  vs_let(obj.map,'map-series','U1',obj.vsopt);
+			u3      =  vs_let(obj.map,'map-series',varargin,'U1',obj.vsopt);
 			u3(u3 == obj.nanval) = NaN;
 			obj.u3_ = u3;
 			% set flow through closed boundary to zero, zmesh fix, where it is set incorrectly to nan
@@ -307,41 +377,45 @@ classdef Delft3D_Map < handle
 %			end % for idx
 		end % if
 	end % u3
-	function v3 = v3(obj)
+	function v3 = v3(obj,varargin)
 		if (~isempty(obj.v3_))
 			v3  = obj.v3_;
 		else
-			v3      =  vs_let(obj.map,'map-series','V1',obj.vsopt);
+			v3      =  vs_let(obj.map,'map-series',varargin,'V1',obj.vsopt);
 			v3(v3 == obj.nanval) = NaN;
 			obj.v3_ = v3;
 		end
 	end
-	function w3 = w3(obj)
+	function w3 = w3(obj,varargin)
 		if (~isempty(obj.w3_))
 			w3  = obj.w3_;
 		else
-			w3      =  vs_let(obj.map,'map-series','WPHY',obj.vsopt);
+			w3      =  vs_let(obj.map,'map-series',varargin,'WPHY',obj.vsopt);
 			w3(w3 == obj.nanval) = NaN;
 			obj.w3_ = w3;
 		end
 	end
 
-	function [ts,tn] = tau_sn(obj)
-		ts = vs_let(obj.map,'map-series','TAUKSI',obj.vsopt);
+	function [ts,tn] = tau_sn(obj,varargin)
+		ts = vs_let(obj.map,'map-series',varargin,'TAUKSI',obj.vsopt);
 		%ts = squeeze(ts(end,:,:));
 		% TODO, make this a matrix
+		if (0)
 		ts = ts(:,2:end-1,:);
 		ts = ts(:,:,1:end-1);
-		ts(:,:,1)  =ts(:,:,2);
-		ts(:,:,end)=ts(:,:,end-1);
+		ts(:,:,1)  = ts(:,:,2);
+		ts(:,:,end)= ts(:,:,end-1);
 		ts = mid(ts,3);
-		tn = vs_let(obj.map,'map-series','TAUETA',obj.vsopt);
+		end
+		tn = vs_let(obj.map,'map-series',varargin,'TAUETA',obj.vsopt);
 		%tn = squeeze(tn(end,:,:));
+		if (0)
 		tn = tn(:,:,2:end-1);
 		tn=tn(:,1:end-1,:);
 		tn(:,1,:) = tn(:,2,:);
 		tn(:,end,:)=tn(:,end-1,:);
 		tn = mid(tn,2);
+		end
 	end
 
 	function [tx,ty] = tau_xy(obj)
@@ -364,18 +438,40 @@ classdef Delft3D_Map < handle
 		ux = shiftdim(ux,3);
 		uy = shiftdim(uy,3);
 	end
-
-	function c = sediment_concentration(obj)
-		if (~isempty(obj.c_))
-			c  = obj.c_;
+	
+	function c = salinity_concentration(obj,varargin)
+		if (~isempty(obj.sediment_concentration_))
+			c  = obj.sediment_concentration_;
 		else
-			c      =  vs_let(obj.map,'map-series','R1',obj.vsopt);
+			c =  vs_let(obj.map,'map-series',varargin,'R1',obj.vsopt);
 			c(c==obj.nanval) = NaN;
-			obj.c_ = c;
+			% quick fix d3d bug
+			%c = max(c,0);
+			obj.salinity_concentration_ = c;
+		end
+	end
+
+	function c = sediment_concentration(obj,varargin)
+		if (~isempty(obj.sediment_concentration_))
+			c  = obj.sediment_concentration_;
+		else
+			c      =  vs_let(obj.map,'map-series',varargin,'R1',obj.vsopt);
+			c(c==obj.nanval) = NaN;
+			% quick fix d3d bug
+			%c = max(c,0);
+			obj.sediment_concentration_ = c;
+		end
+	end
+	function ct = ct(obj,k,varargin)
+		ck = obj.sediment_concentration(varargin{:});
+		if (nargin()<2 || isempty(k))
+			ct = sum(ck,5);
+		else
+			ct = sum(ck(:,:,:,:,k),5);
 		end
 	end
 	function c = concentration_flux_averaged(obj)
-		%if (~isempty(obj.c_))
+		%if (~isempty(obj.sediment_concentration_))
 		%end
 			% TODO this is only valid for equal vertical cell size
 			c = obj.sediment_concentration();
@@ -420,23 +516,25 @@ classdef Delft3D_Map < handle
 		end
 	end
 
-	function u2 = u2(obj)
+	function u2 = u2(obj,varargin)
 		if (~isempty(obj.u2_))
 			u2 = obj.u2_;
 		else
-			u3 = obj.u3;
-			% TODO weight with layer thickness and make it a function
-			u2 = nanmean(u3,4);
+			u3 = obj.u3(varargin{:});
+			ds = cvec(obj.dsigma);
+			ds = shiftdim(ds,-3);
+			u2 = nansum(u3.*ds,4);
 			obj.u2_ = u2;
 		end
 	end
-	function v2 = v2(obj)
+	function v2 = v2(obj,varargin)
 		if (~isempty(obj.v2_))
 			v2 = obj.v2_;
 		else
-			v3 = obj.v3;
-			% TODO weight with layer thickness and make it a function
-			v2 = nanmean(v3,4);
+			v3 = obj.v3(varargin{:});
+			ds = cvec(obj.dsigma);
+			ds = shiftdim(ds,-3);
+			v2 = nansum(v3.*ds,4);
 			obj.v2_ = v2;
 		end
 	end
@@ -452,72 +550,110 @@ classdef Delft3D_Map < handle
 	end
 	
 	% note: ssuu is already depth integrated
-	function ssu2 = ssu2(obj)
-		if (~isempty(obj.ssu2_))
-			ssu2 = obj.ssu2_;
+	% Note : this is transport per unit width (!)
+	function ssuk = ssuk(obj,varargin)
+		if (~isempty(obj.ssuk_))
+			ssuk = obj.ssuk_;
 		else
 			if (~isempty(vs_find(obj.map,'SSUU')))
-				ssu2   =  vs_let(obj.map,'map-sed-series','SSUU',obj.vsopt);
-				ssu2(ssu2 == obj.nanval) = NaN;
-				%ssu3 = squeeze(ssu3(:,2:end-1,1:end-1,:));
-				obj.ssu2_ = ssu2;
+				ssuk   =  vs_let(obj.map,'map-sed-series',varargin,'SSUU',obj.vsopt);
+				ssuk(ssuk == obj.nanval) = NaN;
+				obj.ssuk_ = ssuk;
 			else
-				ssu2 = [];
+				ssuk = [];
 			end
 		end
 	end
 
-	function ssv2 = ssv2(obj)
-		if (~isempty(obj.ssv2_))
-			ssv2 = obj.ssv2_;
+	function ssvk = ssvk(obj,varargin)
+		if (~isempty(obj.ssvk_))
+			ssvk = obj.ssvk_;
 		else
-			ssv2   =  vs_let(obj.map,'map-sed-series','SSVV',obj.vsopt);
-			ssv2(ssv2 == obj.nanval) = NaN;
+			ssvk   =  vs_let(obj.map,'map-sed-series',varargin,'SSVV',obj.vsopt);
+			ssvk(ssvk == obj.nanval) = NaN;
 			%ssv3 = squeeze(ssv3(:,1:end-1,2:end-1,:));
-			obj.ssv2_ = ssv2;
+			obj.ssvk_ = ssvk;
 		end
 	end
 
-	function sbu3 = sbu3(obj)
-		if (~isempty(obj.sbu3_))
-			sbu3 = obj.sbu3_;
+	function sbuk = sbuk(obj,varargin)
+		if (~isempty(obj.sbuk_))
+			sbuk = obj.sbuk_;
 		else
-			sbu3   =  vs_let(obj.map,'map-sed-series','SBUU',obj.vsopt);
-			sbu3(sbu3 == obj.nanval) = NaN;
+			sbuk   =  vs_let(obj.map,'map-sed-series',varargin,'SBUU',obj.vsopt);
+			sbuk(sbuk == obj.nanval) = NaN;
 			%sbu3 = squeeze(sbu3(:,2:end-1,1:end-1,:));
-			obj.sbu3_ = sbu3;
+			obj.sbuk_ = sbuk;
 		end
 	end
 
-	function sbv3 = sbv3(obj)
-		if (~isempty(obj.sbv3_))
-			sbv3 = obj.sbu3_;
+	function sbvk = sbvk(obj,varargin)
+		if (~isempty(obj.sbvk_))
+			sbvk = obj.sbuk_;
 		else
-			sbv3   =  vs_let(obj.map,'map-sed-series','SBVV',obj.vsopt);
-			sbv3(sbv3 == obj.nanval) = NaN;
-			%sbv3 = squeeze(sbv3(:,1:end-1,2:end-1,:));
-			obj.sbv3_ = sbv3;
+			sbvk   =  vs_let(obj.map,'map-sed-series',varargin,'SBVV',obj.vsopt);
+			sbvk(sbvk == obj.nanval) = NaN;
+			obj.sbvk_ = sbvk;
 		end
 	end
 
-	function ssu = ssu(obj)
+	function ssu = ssu(obj,k,varargin)
 		if (~isempty(obj.ssu_))
 			ssu = obj.ssu_;
 		else
-			ssu3 = obj.ssu3;
-			% sum fractions
-			ssu = nansum(ssu3,4);
+			ssuk = obj.ssuk(varargin{:});
+			% sum transport over fractions
+			if (isempty(k))
+				ssu = nansum(ssuk,4);
+			else
+				ssu = nansum(ssuk(:,:,:,k),4);
+			end
 			obj.ssu_ = ssu;
 		end
 	end
-	function ssv = ssv(obj)
+	function ssv = ssv(obj,k,varargin)
 		if (~isempty(obj.ssv_))
 			ssv = obj.ssv_;
 		else
-			ssv3 = obj.ssv3;
+			ssvk = obj.ssvk(varargin{:});
 			% sum fractions
-			ssv = nansum(ssv3,4);
+			if (isempty(k))
+				ssv = nansum(ssvk,4);
+			else
+				ssv = nansum(ssvk(:,:,:,k),4);
+			end
 			obj.ssv_ = ssv;
+		end
+	end
+	
+	function dssv = dssv(obj,k,varargin)
+		if (~isempty(obj.dssv_))
+			dssv = obj.dssv_;
+		else
+			ssvk = obj.ssvk(varargin{:});
+			size(ssvk)
+			% sum fractions
+			if (isempty(k))
+				dssv = nansum(ssvk.*shiftdim(cvec(obj.gsd.d(k)),-3),4) ./sum(ssvk,4);
+			else
+				dssv = nansum(ssvk(:,:,:,k).*shiftdim(cvec(obj.gsd.d(k)),-3),4) ./ sum(ssvk(:,:,:,k),4);
+			end
+			obj.dssv_ = dssv;
+		end
+	end
+
+	function pssv = pssv(obj,k,varargin)
+		if (~isempty(obj.ssv_))
+			pssv = obj.pssv_;
+		else
+			ssvk = obj.ssvk(varargin{:});
+			% sum fractions
+			if (isempty(k))
+				pssv = ssvk./nansum(ssvk,4);
+			else
+				pssv = ssvk./nansum(ssvk(:,:,:,k),4);
+			end
+			obj.pssv_ = pssv;
 		end
 	end
 
@@ -525,9 +661,9 @@ classdef Delft3D_Map < handle
 		if (~isempty(obj.sbu_))
 			sbu = obj.sbu_;
 		else
-			sbu3 = obj.sbu3;
+			sbuk = obj.sbuk;
 			% sum fractions
-			sbu = nansum(sbu3,4);
+			sbu = nansum(sbuk,4);
 			obj.sbu_ = sbu;
 		end
 	end
@@ -535,9 +671,9 @@ classdef Delft3D_Map < handle
 		if (~isempty(obj.sbv_))
 			sbv = obj.sbv_;
 		else
-			sbv3 = obj.sbv3;
+			sbvk = obj.sbvk;
 			% sum fractions
-			sbv = nansum(sbv3,4);
+			sbv = nansum(sbvk,4);
 			obj.sbv_ = sbv;
 		end
 	end
@@ -565,16 +701,25 @@ classdef Delft3D_Map < handle
 			k  = vs_let(obj.map,'map-const','KMAX',obj.vsopt);
 			nc = vs_let(obj.map,'map-const','LSTCI',obj.vsopt);
 	end
-
-	function msed = grain_size(obj)
-		[m,n,k,nc] = obj.mnk();
-		nt      = length(obj.time);
-		[msed] = obj.grain_size_UL({},{1:n, 1:m, 1, 1:nc});
+	
+	function gsd = grain_size_pdf(obj,varargin)
+		msed = obj.msed(varargin{:});
+		gsd  = msed./sum(msed,5);
 	end
 
-	% ged grain size of transport and under layer
-	function [msed,pdf,diametre,msum,diametre_class] = grain_size_UL(obj,tdx,gdx)
-		%squeeze(vs_let(map.map,'map-sed-series',{},'MSED',{2:3, 20, 1, 1:4}, map.vsopt))
+	function msed = msed(obj,varargin)
+		[m,n,k,nc] = obj.mnk();
+		nt      = obj.nt();
+		if (numel(varargin)>0)
+			tdx = varargin;
+		else
+			tdx={};
+		end
+		msed = obj.msed_UL(tdx,{1:n, 1:m, 1, 1:nc});
+	end
+
+	% mass in under layers (bed material)
+	function [msed,pdf,diametre,msum,diametre_class] = msed_UL(obj,tdx,gdx)
 		if (nargin()<2)
 			tdx = {};
 		end
@@ -618,78 +763,123 @@ classdef Delft3D_Map < handle
 		end
 	end
 
-	function dm = dm(obj)
+	function dm = dm(obj,varargin)
 		if (~isempty(vs_find(obj.map,'DM')))
-			dm = vs_let(obj.map,'map-sed-series','DM',obj.vsopt);
+			dm = vs_let(obj.map,'map-sed-series',varargin,'DM',obj.vsopt);
 			%	dm = cell2mat(cellfun(@(x) shiftdim(x,-1),dm,'uniformoutput',false));
 		else
 			dm = [];
 		end
 	end
 
-	function x = turbulence(obj)
+	function x = turbulence(obj,varargin)
 		if (~isempty(vs_find(obj.map,'RTUR1')))
-			x = vs_let(obj.map,'map-series','RTUR1',obj.vsopt);
+			x = vs_let(obj.map,'map-series',varargin,'RTUR1',obj.vsopt);
 		else
 			x = [];
 		end
 	end % furbulence ()
 
-	function v = sediment_mass(obj)
-			v = vs_let(obj.map,'map-sed-series','MSED',obj.vsopt);
+	function v = sediment_mass(obj,varargin)
+			v = vs_let(obj.map,'map-sed-series',varargin,'MSED',obj.vsopt);
 	end
 	
 	function quiver(obj,u,v,varargin)
-		obj.smesh.quiver(u,v,varargin{:});
+		obj.smesh.quiver(u,v,varargin);
 	end
-	function v = duneheight(obj)
+	function v = duneheight(obj,varargin)
 		if (isempty(obj.duneheight_))
-			obj.duneheight_ = vs_let(obj.map,'map-sed-series','DUNEHEIGHT',obj.vsopt); 
+			obj.duneheight_ = vs_let(obj.map,'map-sed-series',varargin,'DUNEHEIGHT',obj.vsopt); 
 		end
 		v = obj.duneheight_;
 	end
-	function v = dunelength(obj)
+	function v = dunelength(obj,varargin)
 		if (isempty(obj.dunelength_))
-			obj.dunelength_=vs_let(obj.map,'map-sed-series','DUNELENGTH',obj.vsopt); 
+			obj.dunelength_=vs_let(obj.map,'map-sed-series',varargin,'DUNELENGTH',obj.vsopt); 
 		end
 		v = obj.dunelength_;
 	end
-	function v = viscosity_uv(obj)
+	function v = viscosity_uv(obj,varargin)
 		if (isempty(obj.viscosity_uv_))
-			obj.viscosity_uv_=vs_let(obj.map,'map-series','VICUV',obj.vsopt);
+			obj.viscosity_uv_=vs_let(obj.map,'map-series',varargin,'VICUV',obj.vsopt);
 		end
 		v = obj.viscosity_uv_;
 	end
-	function v = nu(obj)
+	function v = Mannung_u(obj,varargin)
 		if (isempty(obj.nu_))
-			obj.nu_=vs_let(obj.map,'map-series','ROUMETU',obj.vsopt);
+			obj.nu_=vs_let(obj.map,'map-series',varargin,'ROUMETU',obj.vsopt);
 		end
 		v = obj.nu_;
 	end
-	function v = Cu(obj)
+	% roughness
+	function v = Chezy_u(obj,varargin)
 		if (isempty(obj.Cu_))
-			obj.Cu_ = vs_let(obj.map,'map-series','CFUROU',obj.vsopt);                     
+			obj.Cu_ = vs_let(obj.map,'map-series',varargin,'CFUROU',obj.vsopt);                     
 		end
 		v = obj.Cu_;
 	end
-	function v=settling_velocity(obj)
+	function v = settling_velocity(obj,varargin)
 		if (isempty(obj.settling_velocity_))
-			obj.settling_velocity_=vs_let(obj.map,'map-sed-series','WS',obj.vsopt); 
+			obj.settling_velocity_=vs_let(obj.map,'map-sed-series',varargin,'WS',obj.vsopt); 
 		end
 			v = obj.settling_velocity_;
 	end	
-	function v=reference_concentration(obj)
+	function v = reference_concentration(obj,varargin)
 		if (isempty(obj.reference_concentration_))
-			obj.reference_concentration_=vs_let(obj.map,'map-sed-series','RCA',obj.vsopt); 
+			obj.reference_concentration_ = vs_let(obj.map, ...
+				   'map-sed-series', varargin,'RCA',obj.vsopt); 
 		end
 		v = obj.reference_concentration_;
 	end	
-	function v=equilibrium_concentration(obj)
+	function v = equilibrium_concentration(obj,varargin)
 		if (isempty(obj.equilibrium_concentration_))
-			obj.equilibrium_concentration_=vs_let(obj.map,'map-sed-series','RSEDEQ',obj.vsopt); 
+			obj.equilibrium_concentration_= vs_let(obj.map, ...	
+				'map-sed-series', varargin,'RSEDEQ',obj.vsopt); 
 		end
 		v = obj.equilibrium_concentration_;
+	end
+	function ustar = shear_velocity(obj,varargin)
+		if (isempty(obj.ustar_))
+			obj.ustar_ = vs_let(obj.map, ...
+				'map-sed-series', varargin, 'USTAR',obj.vsopt);
+		end
+		v = obj.ustar_;
 	end	
+	function volume = volume(obj,varargin)
+		if (isempty(obj.volume_))
+			area   = obj.area();
+			dz     = obj.dz(varargin{:});
+			volume = shiftdim(area,-1).*dz;
+			obj.volume_ = volume;
+		end
+		volume = obj.volume_;
+	end
+	function area = area(obj)
+		if (isempty(obj.area_))
+			obj.area_ = squeeze(vs_let('map-const','GSQS',obj.vsopt));
+		end
+		area = obj.area_;
+	end
+
+	function dp = particle_size(obj,k,varargin)
+		ck = obj.sediment_concentration(varargin);
+		ct = obj.ct(k,varargin{:});
+		if (isempty(k))
+			k = 1:size(ck,5);
+		end
+		dp = sum(ck(:,:,:,:,k).*shiftdim(cvec(obj.gsd.d(k)),-4),5)./ct;
+	end
+
+	function dxx = dxx(obj, k, varargin)
+		dxx = vs_let(obj.map, 'map-sed-series', varargin, ...
+					       ['DXX0',num2str(k)], obj.vsopt);
+	end
+	function val = morfac(obj,varargin)
+		if (isempty(obj.morfac_))
+			obj.morfac_ = vs_let('map-infsed-serie','MORFAC',varargin,obj.vsopt);
+		end
+		val = obj.morfac_;
+	end
 	end % methods
 end % class Delft3D_Map
 

@@ -63,14 +63,58 @@ classdef Delft3D_Mor < handle
 			f_C = fieldnames(obj.dat);
 			for idx=1:length(f_C)
 				if (isnan(obj.dat.(f_C{idx})))
+					% print header (nan-value)
 					fprintf(fid,'[%s]\n',f_C{idx});
 				else
-					fprintf(fid,'%s = %s\n',f_C{idx},obj.dat.(f_C{idx}));
+					vuc = obj.dat.(f_C{idx});
+					if (~isempty(vuc))
+					% split into value, unit and comment
+					vuc = regexprep(regexprep(vuc,'^ *',''),' *$','');
+					k   = strfind(vuc,' ');
+					if (isempty(k))
+						k = length(vuc);
+					end
+					k = k(1);
+					val = vuc(1:k);
+					uc  = vuc(k+1:end);
+					uc = regexprep(regexprep(uc,'^ *',''),' *$','');
+					k   = strfind(uc,']');
+					% get unit
+					if (isempty(k))
+						k = 0;
+					end
+					unit    = uc(1:k);
+					comment = uc(k+1:end);
+					% fetch values only for numbers (and not filenames)
+					if (~isempty(str2num(val)))	
+					if (isempty(unit))
+						try
+							unit = Mor_Units.(f_C{idx});
+						catch e
+							e
+							unit = '';
+						end
+					end
+					end
+					else
+						val = '';
+						unit = '';
+						comment = '';
+					end
+					fprintf(fid,'%-12s = %-15s %-3s %s\n',f_C{idx},val,unit,comment);
 				end
 			end
 			fclose(fid);
-		end	
+		end
+		function set_behind(obj,field,value,predecessor)
+			if (isfield(obj.dat,field))
+				obj.dat.(field) = value;
+			else
+				obj.dat=setfield_behind(obj.dat,field,value,predecessor);
+			end
+		end
 		function set(obj,s)
+			if (~isempty(s))
 			f_C = fieldnames(s);
 			for idx=1:length(f_C)
 				val = s.(f_C{idx});
@@ -83,11 +127,14 @@ classdef Delft3D_Mor < handle
 						val = 'false';
 					end
 					obj.dat.(f_C{idx}) = val;
+				elseif (ischar(val))
+					obj.dat.(f_C{idx}) = val;
 				else
-					f_C{idx}
-					val
+					disp(f_C{idx});
+					disp(val);
 					error('here');
 				end
+			end
 			end
 		end
 	end % methods

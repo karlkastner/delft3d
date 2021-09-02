@@ -24,7 +24,7 @@ function quiver_cs(obj,tid,cid,u,v,nq,varargin)
 	Z_ = innerspace(zmin,0,nq(2));
 
 	u_ = interp1(N,u,N_);
--> TODO, z varies per column -> interpolated 2d !! or loop
+%-> TODO, z varies per column -> interpolated 2d !! or loop
 	u_ = interp1(Z,u_.',Z_)';
 	v_ = interp1(N,v,N_);
 	v_ = interp1(Z,v_.',Z_)';

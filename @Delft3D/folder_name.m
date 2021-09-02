@@ -10,4 +10,5 @@ function folder = folder_name(obj,base,param)
 		end
 		folder = [folder,'-',field_C{idx},'_',val];
 	end
-end
+end % folder_name
+

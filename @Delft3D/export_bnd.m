@@ -5,15 +5,25 @@ function obj = export_bnd(obj,file_str)
 	if (fid < 1)
 		error('here');
 	end
+	% filetype = T for bct, H for harmonics
 	for idx=1:length(bnd)
+		switch (obj.bnd(idx).type)
+		case {'Z'}
+			s = '';
+		case {'T'}
+			s = 'Logarithmic';
+		end
+
 		fprintf(fid,'%-20s %1s %1s %5d %5d %5d %5d %1.7e %s\n', ...
 			bnd(idx).name, ...
 			bnd(idx).type, ...
-			'T', ...
+			bnd(idx).filetype, ...
 			bnd(idx).left(1:2), ...
 			bnd(idx).right(1:2), ...
 			0.0, ...
-			'Uniform');
+			s);
+			%'Logarithmic');
+			%'Uniform');
 	end
 	fclose(fid);
 end % export_bn

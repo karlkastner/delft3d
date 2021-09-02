@@ -14,8 +14,9 @@ function plot_cs(obj,tid,cid,cjd,val)
 		val = squeeze(val)';
 		%imagesc(val);
 		%S(:,end) = 2*S(:,end-1)-S(:,end-2); S(end,:) = 2*S(end-2,:)-S(end-1);
-		N(:,end) = 2*N(:,end-1)-N(:,end-2);
-		N(end,:) = 2*N(end-2,:)-N(end-1);
+		N  = inner2outer(inner2outer(N,1),2);
+%		N(:,end) = 2*N(:,end-1)-N(:,end-2);
+%		N(end,:) = 2*N(end-2,:)-N(end-1);
 		NN       = (N(cid,:)'*ones(1,size(val,1)))';
 		ZZ       = squeeze(Z(tid,cid,:,:))';
 		surface(NN(:,2:end-1),ZZ(:,2:end-1),val(:,2:end-1),'edgecolor','none');
@@ -24,8 +25,9 @@ function plot_cs(obj,tid,cid,cjd,val)
 		Z   = obj.Z;
 		val = squeeze(val)';
 
-		S(:,end) = 2*S(:,end-1)-S(:,end-2);
-		S(end,:) = 2*S(end-2,:)-S(end-1);
+		S  = inner2outer(inner2outer(S,1),2);
+%		S(:,end) = 2*S(:,end-1)-S(:,end-2);
+%		S(end,:) = 2*S(end-2,:)-S(end-1);
 		%N(:,end) = 2*N(:,end-1)-N(:,end-2); N(end,:) = 2*N(end-2,:)-N(end-1);
 		SS = (ones(size(val,1),1)*S(:,cjd));
 		ZZ = squeeze(Z(tid,:,cjd,:))';

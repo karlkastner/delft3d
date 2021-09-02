@@ -32,6 +32,7 @@
    BShld            = 0.5                  [-]      Bed slope parameter Koch & Flokstra f = A theta^B
    UpdInf           = false                [1]      Update bed level at inflow boundaries
    IHidExp          = 1                    [1]      1 : no hiding or exposure
+   BcFil            =
 [Underlayer]
    IUnderLyr        = 2                    [-]      Stratigraphy model : 1 : one layer, 2 : multiple layers
    ExchLyr          = false                [-]     
@@ -43,6 +44,7 @@
    IPorosity        = 0                    [-]      dynamically calculate porosity
    IDiffusion       = 0                            
    Flufflyr         = 0                            
+   IniComp          =
 [Output]
    Frac             = true                         
    Dm               = true                 [-]      Output arithmetic mean sediment diameter

@@ -1,9 +1,10 @@
 % 2018-11-15 14:41:39.761965649 +0100
-
+%
 % this is not exact
-function [qu,qv] = discharge(obj)
-	u = obj.u2;
-	v = obj.v2;
+%function [qu,qv] = discharge(obj)
+function [qu,qv] = discharge(obj,varargin)
+	u = obj.u2(varargin{:});
+	v = obj.v2(varargin{:});
 
 	%xcor = obj.X;
 	%ycor = obj.Y;
@@ -15,7 +16,8 @@ function [qu,qv] = discharge(obj)
 	y = obj.Y;
 	%x=smesh.X;
 	%y=smesh.Y;
-	d  = obj.zs - obj.zb;
+	d = obj.depth(varargin{:});
+	%d  = obj.zs(varargin{:}) - obj.zb(varargin{:});
 	%d  = d(:,:,2:end-1);
 	d_ = squeeze(d(:,:,2:end-1));
 	%d_ = squeeze(d(end,:,:));

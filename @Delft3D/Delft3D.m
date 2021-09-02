@@ -1,5 +1,7 @@
 % Tue 10 Mar 12:35:54 +08 2020
 %
+%% interface for automatically generating and reading Delft3D-4 models
+%
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation, either version 3 of the License, or
@@ -14,22 +16,49 @@
 % along with this program.  If not, see <https://www.gnu.org/licenses/>.
 classdef Delft3D < handle
 	properties
-		mesh;
+		% structured mesh object
+		mesh
+		% model-definition-file object
 		mdf
+		% mor-file object
 		mor
+		% sed-file object
 		sed
+		% boundary condition location
 		bnd
+		% boundary condition as time series
 		bct	
-		bcc	
+		% boundary values as harmonic series
+		bch
+		% suspended sediment concentration boundary values as times series
+		bcc
+		% salinity concentration at boundary as time series
+		bcc_sal
+		% bed load transport boundary values as times series
+		bcm
+		% measurement cross sections
 		crs
+		% observation points
 		obs
+		% time-varying morfac
+		MorFac
+		% thin dames
 		thin_dams
+		% initial condition
+		ini
+		inicomp
+		% domain decomposition
+		ddb
 
 		itdate
 		tratype
 		reference_level = 0.0;
 
+		% folder, where model files reside in
 		folder
+		hfolder
+
+		% basename for model files
 		base = 'delft3d';
 	end %  properties
 	methods
@@ -38,15 +67,10 @@ classdef Delft3D < handle
 			obj.mdf  = Delft3D_Mdf();
 			obj.mor  = Delft3D_Mor();
 			obj.sed  = Delft3D_Sed();
-			%obj.bnd  = struct();
-			%obj.bcc  = struct();
-			%obj.crs  = struct();
-			%obj.obs  = struct();
-			%obj.thin_dams = struct();
 		end % constructor
 
 		function folder = templatefolder(obj)
-			w=what(class(obj));
+			w      = what(class(obj));
 			folder = [dirname(w.path),'/delft3d-template'];
 		end
 

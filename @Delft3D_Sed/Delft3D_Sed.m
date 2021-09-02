@@ -56,6 +56,7 @@ classdef Delft3D_Sed < handle
 		function obj = read(obj,file_str)
 			if (nargin() < 2)
 				w       = what(class(obj));
+				% TODO no magic names
 				file_str = [w.path,filesep,'delft3d.sed'];
 			end
 			obj.dat = struct();
@@ -101,7 +102,9 @@ classdef Delft3D_Sed < handle
 					f_C = fieldnames(section(kdx));
 					%obj.dat.(sed.dat{1});
 					for idx=1:length(f_C)
-						fprintf(fid,'%s = %s\n',f_C{idx},section(kdx).(f_C{idx}));
+						if (~isempty(section(kdx).(f_C{idx})))
+							fprintf(fid,'%s = %s\n',f_C{idx},section(kdx).(f_C{idx}));
+						end
 					end % for idx
 				end % % for kdx
 			end % for jdx

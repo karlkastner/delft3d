@@ -1,44 +1,45 @@
 % 2016-12-12 07:41:20.339808366 +0100
-
-function obj = video(obj,arg1,dt_plot,dt_pause,filename,clim)
-%	if (nargin()<3)
-%		% id=1
-%		%id = length(obj.map.time);
-%		id = size(arg1,2);
-%	end
+%
+% function obj = video(obj,arg1,dt_plot,dt_pause,filename,clim)
+function obj = video(obj,tdx,arg1,dt_plot,dt_pause,filename,clim)
+	ncolor = 256;
 
 	mtime  = obj.tmor();
 	if (mtime(end) == mtime(1))
 		mtime = obj.time();
 	end
-	T      = mtime(end)-mtime(1);
+	t0 = mtime(1);
+	mtime = mtime(tdx);
+	T      = mtime(end)-t0;
 
-	if (nargin()<3 || isempty(dt_plot))
+	if (nargin()<4 || isempty(dt_plot))
 		dt_plot = []; % T/min(100,length(mtime)-1);
 	end
-	if (nargin()<4 || isempty(dt_pause))
+
+	if (nargin()<5 || isempty(dt_pause))
 		dt_pause = 1;
 	end
-	if (nargin()<5)
+	if (nargin()<6)
 		filename = ['video-',datestr(now,'yyyy-mm-dd-HH-MM-SS'),'.gif'];
 	end
 	if (isnumeric(arg1))
 		val = arg1;
 	else
-		field = arg1;
-		switch (field)
-		case {'id'}
-			val = (1:(length(obj.map.FlowElem_xcc)))';
-		case {'z'}
-			val = obj.map.FlowElem_zcc;
-		case ('umag')
-			val = sqrt(obj.map.ucx.^2+obj.map.ucy.^2);
-		otherwise
-			val = obj.map.(field);
-		end
+		val = obj.(arg1)(tdx);
+%		field = arg1;
+%		switch (field)
+%		case {'id'}
+%			val = (1:(length(obj.map.FlowElem_xcc)))';
+%		case {'z'}
+%			val = obj.map.FlowElem_zcc;
+%		case ('umag')
+%			val = sqrt(obj.map.ucx.^2+obj.map.ucy.^2);
+%		otherwise
+%			val = obj.map.(field);
+%		end
 	end
-	if (nargin()<6)
-		clim = [];
+	if (nargin()<7)
+		clim = limits(flat(val));
 	end
 
 	n = size(val,1);
@@ -137,23 +138,25 @@ function obj = video(obj,arg1,dt_plot,dt_pause,filename,clim)
 			drawnow();
 			%pause(dt_pause);
 
-			f   = getframe();
-			img = cat(2,img,f.cdata);
+			f    = getframe();
+			siz_ = size(f.cdata);
+			img(1:siz_(1),1:siz_(2),:,end+1) = f.cdata;
+			%img_ = img;
 			%img(:,:,:,k) = f.cdata
-			if (1 == idx)
-				siz = size(img);
 				%[img,map] = rgb2ind(f.cdata,256,'nodither');
-			end
 
 			%if (~isempty(filename))
 			%	print('-dpng',sprintf('%s-%03d.png',filename,k));
 			%	k = k+1;
 			%end
 		end
-		ncolor = 256;
+		siz = size(img);
+		img = reshape(img,[prod(siz(1:2)),siz(3),siz(4)]);
 		[img,cmap] = rgb2ind(img,ncolor,'nodither');
-		img3 = reshape(img,siz(1),siz(2),[]);
-		img_(:,:,1,:) = img3;
+		img = reshape(img,siz(1:3));
+		img = permute(img,[2,3,1]);
+		%img = reshape(img,siz(1),siz(2),[]);
+		img_(:,:,1,:) = img;
 		imwrite(img_,cmap,filename,'gif','DelayTime',dt_pause,'LoopCount',0);
 	%end
 

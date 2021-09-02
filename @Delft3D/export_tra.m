@@ -3,7 +3,9 @@ function export_tra(obj,folder)
 	what_    = what('Delft3D');
 %	srcdir   = what_.path;
 %	copyfile([what_.path,'/vr1984.tra'],folder);
-	switch (obj.mdf.mdf.dat.TraFrm)
+	TraFrm = obj.mdf.mdf.dat.TraFrm;
+	TraFrm = strtrim(TraFrm); 
+	switch (TraFrm)
 	case {'#eh.tra#'}
 		fid = fopen([folder,filesep,'eh.tra'],'w');
 		fprintf(fid,'1          IFORM\n');
@@ -28,6 +30,8 @@ function export_tra(obj,folder)
 		fid = fopen([folder,filesep,'vr1993.tra'],'w');
 		fprintf(fid,'-1        IFORM\n');
 		fclose(fid);
+	case {'#vr2007.tra#'}
+		warning(['not yet implemented ',obj.mdf.mdf.dat.TraFrm]);
 	otherwise
 		error(['here ',obj.mdf.mdf.dat.TraFrm]);
 	end
