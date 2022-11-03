@@ -5,7 +5,7 @@ function write_ddb(obj)
 	if (~isempty(ddb))
 
 	%filename = [obj.folder, '/', obj.runid , '.ddb'];
-	filename = [obj.folder, '/', obj.base , '.ddb'];
+	filename = [obj.folder, '/', obj.runid , '.ddb'];
 
 	fid      = fopen(filename,'w');
 	if (fid <= 0)
@@ -14,7 +14,7 @@ function write_ddb(obj)
 	for idx=1:size(ddb,1)
 		for jdx=1:2
 			if (isnumeric(ddb(idx,jdx).runid))
-				runid{jdx} = [obj.base,sprintf('%02d',ddb(idx,jdx).runid),'.grd'];
+				runid{jdx} = [obj.runid,sprintf('%02d',ddb(idx,jdx).runid),'.grd'];
 			else
 				runid{jdx} = ddb(idx,jdx).runid;
 			end

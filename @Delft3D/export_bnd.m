@@ -5,6 +5,8 @@ function obj = export_bnd(obj,file_str)
 	if (fid < 1)
 		error('here');
 	end
+	Rettis = zeros(length(bnd),1);
+	Rettib = zeros(length(bnd),1);
 	% filetype = T for bct, H for harmonics
 	for idx=1:length(bnd)
 		switch (obj.bnd(idx).type)
@@ -24,7 +26,17 @@ function obj = export_bnd(obj,file_str)
 			s);
 			%'Logarithmic');
 			%'Uniform');
+		if (isfield(bnd(idx),'Rettis') && ~isempty(bnd(idx).Rettis))
+			Rettis(idx,1) = bnd(idx).Rettis;
+		end
+		if (isfield(bnd(idx),'Rettib') && ~isempty(bnd(idx).Rettib))
+			Rettib(idx,1) = bnd(idx).Rettib;
+		end
 	end
 	fclose(fid);
-end % export_bn
+	Rettis = sprintf('%g\n',Rettis);
+	obj.mdf.mdf.dat.Rettis = chomp(Rettis);
+	Rettib = sprintf('%g\n',Rettib);
+	obj.mdf.mdf.dat.Rettib = chomp(Rettib);
+end % export_bnd
 

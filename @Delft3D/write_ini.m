@@ -17,21 +17,24 @@ function write_ini(obj,filename)
 	dval = 999;
 
 	if (isfield(ini,'Zeta0'))
-	if (isnumeric(ini.Zeta0))
+		if (isnumeric(ini.Zeta0))
 			zs = repmat(ini.Zeta0,size(obj.mesh.X));
+		else
+			zs = feval(ini.Zeta0,obj.mesh.X,obj.mesh.Y);
+	
+	%		zs = z00*ones(size(zb));
+	%		if (abs(Q0)>0)
+	%			zs = max(zs,zb+h0);
+	%		end
+		%	zs = [mid(zs(1:end-),zs(end)];
+			%zs = [2*zs(:,1)-zs(:,2),zs(:,1:end-1)];
+			zs = [2*zs(:,1)-zs(:,2),zs]; %;(:,1:end-1)];
+			zs = mid(zs')';
+			%zs = [zs,2*zs(:,end)-zs(:,end-1)];
+		end
 	else
-		zs = feval(ini.Zeta0,obj.mesh.X,obj.mesh.Y);
-
-%		zs = z00*ones(size(zb));
-%		if (abs(Q0)>0)
-%			zs = max(zs,zb+h0);
-%		end
-	%	zs = [mid(zs(1:end-),zs(end)];
-		%zs = [2*zs(:,1)-zs(:,2),zs(:,1:end-1)];
-		zs = [2*zs(:,1)-zs(:,2),zs]; %;(:,1:end-1)];
-		zs = mid(zs')';
-		%zs = [zs,2*zs(:,end)-zs(:,end-1)];
-	end
+		printf('Using default value of 0 for initial water level');
+		zs = repmat(0,size(obj.mesh.X));
 	end
 	zs(:,end+1) = zs(:,end);	
 	zs(end+1,:) = zs(end,:);
@@ -42,9 +45,11 @@ function write_ini(obj,filename)
 		else
 			u0 = feval(ini.u0,obj.mesh.X,obj.mesh.Y);
 		end
-		u0 = [2*u0(:,1)-u0(:,2),u0];
-		u0 = mid(u0')';
+	else
+		u0 = zeros(size(obj.mesh.X));
 	end
+	u0 = [2*u0(:,1)-u0(:,2),u0];
+	u0 = mid(u0')';
 	u0(:,end+1) = u0(:,end);	
 	u0(end+1,:) = u0(end,:);
 
@@ -85,7 +90,8 @@ end
 	end
 	% salinity
 if (0)
-	sub1 = strtrim(obj.mdf.mdf.dat.Sub1);
+	%sub1 = strtrim(obj.mdf.mdf.dat.Sub1);
+	sub1 = obj.mdf.get('Sub1');
 	if (    (length(sub1)>1) && (sub1(1) == 'S'))
 		S0 = 0;
 		write_(S0);

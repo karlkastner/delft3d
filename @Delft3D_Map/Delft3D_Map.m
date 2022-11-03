@@ -1,4 +1,3 @@
-% Mon  5 Nov 10:21:52 CET 2018
 % Wed 18 Jul 14:06:41 CEST 2018
 %
 % This program is free software: you can redistribute it and/or modify
@@ -77,44 +76,14 @@ classdef Delft3D_Map < handle
 		bsparam;
 		cp;
 		morfac_;
+		folder
+		runid = '*';
 	end
 	methods
-	function obj = Delft3D_Map()
-	end
-	function init(obj,folder_)
-		% clear
-		% TODO, reset tmp vars
-		obj.map   = [];
-		if (strcmp(folder_(end-2:end),'dat'))
-			path = folder_;
-		else
-		try
-			path = ls([folder_,'/trim-delft3d.dat']);
-			path = chomp(path);
-		catch e1
-			try
-				path = ls([folder_,'/*/trim-delft3d.dat']);
-				path_C = strsplit(path,'\n');
-				path = path_C{1};
-				path = chomp(path);
-			catch e2
-				disp(e1)
-				disp(e2)
-				return;
-			end
+	function obj = Delft3D_Map(varargin)
+		for idx=1:2:length(varargin)-1
+			obj.(varargin{idx}) = varargin{idx+1};
 		end
-		end
-		obj.map   = vs_use(path,obj.vsopt);
-		try
-			gsd = load([folder_,'/gsd.csv']);
-			obj.gsd.d = gsd(1,:);
-			obj.gsd.p = gsd(2,:); 
-		catch e
-			e
-		end
-
-		% init mesh
-		obj.X();
 	end
 	function nz = nz(obj)
 		if (~isempty(obj.nz_))
@@ -192,40 +161,26 @@ classdef Delft3D_Map < handle
 		[Xc,Yc] = obj.Xc;
 	end
 
-	% TODO pass from smesh
 	function [X,Y] = X(obj)
 		if (isempty(obj.smesh))
 			X = vs_get(obj.map,'map-const','XCOR',obj.vsopt);
 			Y = vs_get(obj.map,'map-const','YCOR',obj.vsopt);
 			% invalidate
 			if (0)
-			[Xc,Yc] = obj.Xc;
-			valid   = true(size(Xc));
-			valid(:,end) = false;
-			v = mid(Xc(:,2:end-1),2)~=0;
-			valid(:,2:end-2) = valid(:,2:end-2) & v;
-%			fdx = (Xc~=0) & (Yc~=0);
-%			fdx(1,:) = true; fdx(end,:) = true;
-%			fdx(:,1) = true; fdx(:,end) = true;
-%			fdx = fdx & (X>0);
-			X(~valid) = NaN;
-			Y(~valid) = NaN;
+				[Xc,Yc] = obj.Xc;
+				valid   = true(size(Xc));
+				valid(:,end) = false;
+				v = mid(Xc(:,2:end-1),2)~=0;
+				valid(:,2:end-2) = valid(:,2:end-2) & v;
+				X(~valid) = NaN;
+				Y(~valid) = NaN;
 			end
 
 			% remove last column
 			X = X(1:end-1,1:end-1);
 		        Y = Y(1:end-1,1:end-1);
-			%fdx = (X==0) && (Y==0);
-		        %X(fdx) = NaN;
-		        %Y(fdx) = NaN;
-			%obj.X_ = X;
-			%obj.Y_ = Y;
 
-			obj.smesh = SMesh();
-			%X = obj.X;
-			%Y = obj.Y;
-			obj.smesh.X = X;
-			obj.smesh.Y = Y;
+			obj.smesh = SMesh('X',X,'Y',Y);
 			obj.smesh.extract_elements(); 
 		else
 			X = obj.smesh.X;
@@ -657,13 +612,17 @@ classdef Delft3D_Map < handle
 		end
 	end
 
-	function sbu = sbu(obj)
+	function sbu = sbu(obj,k,varargin)
 		if (~isempty(obj.sbu_))
 			sbu = obj.sbu_;
 		else
-			sbuk = obj.sbuk;
+			sbuk = obj.sbuk(varargin{:});
 			% sum fractions
-			sbu = nansum(sbuk,4);
+			if (isempty(k))
+				sbu = nansum(sbuk,4);
+			else
+				sbu = nansum(sbuk(:,:,:,k),4);
+			end
 			obj.sbu_ = sbu;
 		end
 	end
@@ -805,7 +764,7 @@ classdef Delft3D_Map < handle
 		end
 		v = obj.viscosity_uv_;
 	end
-	function v = Mannung_u(obj,varargin)
+	function v = Manning_u(obj,varargin)
 		if (isempty(obj.nu_))
 			obj.nu_=vs_let(obj.map,'map-series',varargin,'ROUMETU',obj.vsopt);
 		end

@@ -1,9 +1,20 @@
 % Tue  2 Feb 14:00:43 CET 2021
 function export_config_xml(obj)
 	w     = what(class(obj));
-	iname = [w.path,'/delft3d.xml']
+	iname = [w.path,'/delft3d.xml'];
 	if (isempty(obj.ddb))
-		copyfile(iname,obj.folder);
+		% copyfile(iname,obj.folder);
+		oname = [obj.folder,filesep,obj.runid,'.xml'];
+		f    = xmlread(iname);
+		c    = f.item(0);
+		c    = c.getChildNodes;
+		d    = c.getElementsByTagName('flow2D3D').item(0);
+		dd   = d.getElementsByTagName('mdfFile').item(0);
+		dd.setTextContent([obj.runid,'.mdf']);
+		d    = c.getElementsByTagName('delftOnline').item(0);
+		dd   = d.getElementsByTagName('urlFile').item(0);
+		dd.setTextContent([obj.runid,'.url']);
+		xmlwrite(oname,f);
 	else
 		oname = [obj.folder,'/delft3d.xml'];
 		f    = xmlread(iname);

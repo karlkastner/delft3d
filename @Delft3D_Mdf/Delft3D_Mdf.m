@@ -36,6 +36,15 @@ classdef Delft3D_Mdf < handle
 			if (~isempty(num))
 				val = num;
 			end
+			if (isstr(val))
+				val = strtrim(val);
+				if (length(val) > 0 && val(1) == '#')
+					val = val(2:end);
+				end
+				if (length(val) > 0 && val(end) == '#')
+					val = val(1:end-1);
+				end
+			end
 		end
 
 		function set_(obj,s)
@@ -47,7 +56,6 @@ classdef Delft3D_Mdf < handle
 				else
 				switch (f{1})
 				case {'Flmap_dt','dt_map'}
-					% TODO make multiple of dt
 					%obj.mdf.Flmap = ['0 ', num2str(val), ' ', obj.mdf.Tstop];
 					obj.mdf.dat.Flmap  = ['0.0000000e+000 ', num2str(val,'%4d'), '  6.0000000e+008'];
 				case {'Flhis_dt'}
@@ -62,7 +70,9 @@ classdef Delft3D_Mdf < handle
 						val = 'false';
 					end
 				elseif (isnumeric(val))
-					val = num2str(val);
+					%val = num2str(val);
+					val = sprintf('%g\n',val);
+					val = chomp(val);
 				elseif (isstr(val))
 					val = ['#',val,'#'];
 				else
@@ -165,19 +175,37 @@ classdef Delft3D_Mdf < handle
 			if (nargin() < 3)
 				folder = '.';
 			end
+			% sanity check runid
+			if (~isfield(obj.mdf.dat,'Runid'))
+				obj.set('Runid','delft3d');
+			end
+
+			% broken in Delft3D 4
+			Tkemod = obj.get('Tkemod');
+			if (length(Tkemod) > 2 && strcmp(Tkemod(1:3),'K-e'))
+			% && obj.param.mor.DensIn)
+				warning('K-eps model is broke in Delft3D 4, esp with DensIn set, causes checkerboarding, use only for testing')
+			end
+
 			% sanity checks
-			% TODO, only if field exists
-			Tlfsmo = str2num(obj.mdf.dat.Tlfsmo);
-			Tstop  = str2num(obj.mdf.dat.Tstop);
-			if (Tlfsmo > Tstop)
-				obj.mdf.dat.Tlfsmo = obj.mdf.dat.Tstop;
-			end
-			for f = {'Flmap','Flhis','Flpp'}
-			val = str2num(obj.mdf.dat.(f{1}));
-			if (val(3) > Tstop)
-				val(3) = Tstop;
-				obj.mdf.dat.(f{1}) = num2str(val);
-			end
+
+			% make stop time multiple of Dt
+			Dt    = obj.get('Dt');
+			Tstop = obj.get('Tstop');
+			Tstop = Dt*round(Tstop/Dt);
+			obj.set('Tstop',Tstop);
+
+			% note that this works also for Fl-fiels which are arrays
+			f_C = {'Tlfsmo','Flmap','Flhis','Flpp'};
+			for idx=1:length(f_C)
+				val = obj.get(f_C{idx});
+				% make times multiple of time step
+				val = Dt*round(val/Dt);
+				% limit end time
+				val = min(val,Tstop);
+				obj.set(f_C{idx},val);
+				% why not set?
+				%obj.mdf.dat.(f_C{idx}) = num2str(val);
 			end % for f
 
 			%obj.mdf.file_str = mdf_str;

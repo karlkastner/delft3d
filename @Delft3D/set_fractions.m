@@ -16,7 +16,8 @@ function [gsd_,obj] = set_fractions(obj,sediment,salinity,hsed,T_C)
 		
 	end
 	idx = [];
-	sub2 = strtrim(obj.mdf.mdf.dat.Sub2);
+	%sub2 = strtrim(obj.mdf.mdf.dat.Sub2);
+	sub2 = obj.mdf.get('Sub2');
 	if (sub2(2) == 'C')
 	if (isempty(sediment))
 		gsd_ = [];

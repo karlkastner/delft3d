@@ -40,6 +40,8 @@ classdef Delft3D < handle
 		crs
 		% observation points
 		obs
+		% roughness
+		rgh
 		% time-varying morfac
 		MorFac
 		% thin dames
@@ -59,7 +61,7 @@ classdef Delft3D < handle
 		hfolder
 
 		% basename for model files
-		base = 'delft3d';
+		runid = 'delft3d';
 	end %  properties
 	methods
 		function obj = Delft3D()
@@ -79,6 +81,29 @@ classdef Delft3D < handle
 			% note the swap of dimensions
 			ij(:,1) = 1 + round(pq(:,1)*(nm(2)-1));
 			ij(:,2) = 1 + round(pq(:,2)*(nm(1)-1));
+		end
+
+		function t = startdate(obj)
+			t = datenum(obj.mdf.get('Itdate'),'yyyy-mm-dd');
+			t = t+obj.mdf.get('Tstart')/1440;
+		end
+		
+		function t = stopdate(obj)
+			t = datenum(obj.mdf.get('Itdate'),'yyyy-mm-dd');
+			t = t+obj.mdf.get('Tstop')/1440;
+		end
+		
+		function Restid = generate_Restid(obj)
+			if (0)
+			%Restid = ['tri-rst.',obj.runid,'.',datestr(obj.stopdate,'yyyymmdd.HHMMSS')];
+			% Note that Delft3D automatically preprends the suffix 'tri-rst.'
+			%Restid = [obj.runid,'.',datestr(obj.stopdate,'yyyymmdd.HHMMSS')];
+			else
+				% note that only the map file can be used as proper "restart" file,
+				% as the "rst" restart file does not contain bed level and grain size information
+				% note that delf3d automatically appends the suffix '.dat'
+				Restid = ['trim-',obj.runid];
+			end
 		end
 	end % methods
 end % Delft3D

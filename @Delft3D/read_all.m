@@ -3,10 +3,9 @@ function read_all(obj,folder)
 	if (nargin<2)
 		folder = obj.folder;
 	end
-	base= obj.base;
-	obj.mdf.read_mdf([folder,filesep,base,'.mdf']);
-	obj.mor.read([folder,filesep,base,'.mor']);
-	obj.sed.read([folder,filesep,base,'.sed']);
+	obj.mdf.read_mdf([folder,filesep,obj.runid,'.mdf']);
+	obj.mor.read([folder,filesep,obj.runid,'.mor']);
+	obj.sed.read([folder,filesep,obj.runid,'.sed']);
 	% TODO,bct,bnd,crs,obj,bcc,bct
 end
 

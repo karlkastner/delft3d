@@ -11,7 +11,7 @@ MNKmax = 3 502 1
 Commnt = Thick : vertical sigma water layer thickness in percent
 Thick  =  1.0000000e+002
 
-Commnt = Fixed vertical cell size (z not sigma model)
+Commnt = Fixed vertical cell size (use z instead of sigma model)
 Zmodel = #N#
 Commnt = Ztbml : Smoothing of z-cells near bottom
 Ztbml  = #Y#

@@ -1,14 +1,16 @@
 % Mon  7 Sep 11:43:33 +08 2020
 % TODO bcc.sal, bcc.sed
 function default_bcc(obj,sediment,salinity,dt_d)
-	sub1 = strtrim(obj.mdf.mdf.dat.Sub1);
-	sub2 = strtrim(obj.mdf.mdf.dat.Sub2);
-	if (length(sub1)>0 && sub1(1) == '#')
-		sub1 = sub1(2:end);
-	end
-	if (length(sub2)>0 && sub2(1) == '#')
-		sub2 = sub2(2:end);
-	end
+	sub1 = obj.mdf.get('Sub1');
+	sub2 = obj.mdf.get('Sub2');
+	%sub1 = strtrim(obj.mdf.mdf.dat.Sub1);
+	%sub2 = strtrim(obj.mdf.mdf.dat.Sub2);
+	%if (length(sub1)>0 && sub1(1) == '#')
+	%	sub1 = sub1(2:end);
+	%end
+	%if (length(sub2)>0 && sub2(1) == '#')
+	%	sub2 = sub2(2:end);
+	%end
 	if (    ((length(sub1)<1) || (sub1(1) ~= 'S')) ...
 	     && ((length(sub2)<2) || (sub2(2) ~= 'C')) ...
 	   )

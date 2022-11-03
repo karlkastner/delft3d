@@ -1,7 +1,7 @@
 % Mon 11 Jun 18:02:49 CEST 2018
 function export_bct(obj,filename,mode)
     bct     = obj.bct;
-    if (~isempty(bct))
+    if (~isempty(bct) && ~isempty(fields(bct)))
         itdate  = obj.itdate;
         bcname_ = filename;
     
